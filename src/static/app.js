@@ -84,3 +84,122 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize app
   fetchActivities();
 });
+
+describe('fetchActivities additional edge cases', () => {
+  let activitiesList;
+  let activitySelect;
+  
+  beforeEach(() => {
+    document.body.innerHTML = `
+      <div id="activities-list"></div>
+      <select id="activity"></select>
+    `;
+    activitiesList = document.getElementById('activities-list');
+    activitySelect = document.getElementById('activity');
+    global.fetch = jest.fn();
+    console.error = jest.fn();
+  });
+
+  test('handles malformed JSON response', async () => {
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => { throw new Error('Invalid JSON') }
+    });
+
+    await fetchActivities();
+
+    expect(activitiesList.innerHTML).toContain('Failed to load activities');
+    expect(console.error).toHaveBeenCalled();
+  });
+
+  test('handles server error response', async () => {
+    global.fetch.mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      json: async () => ({ error: 'Server Error' })
+    });
+
+    await fetchActivities();
+
+    expect(activitiesList.innerHTML).toContain('Failed to load activities');
+  });
+
+  test('displays zero spots left correctly', async () => {
+    const mockActivities = {
+      'Full Activity': {
+        description: 'No spots available',
+        schedule: 'Monday 10am',
+        max_participants: 5,
+        participants: ['1', '2', '3', '4', '5']
+      }
+    };
+
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockActivities
+    });
+
+    await fetchActivities();
+
+    expect(activitiesList.innerHTML).toContain('0 spots left');
+  });
+
+  test('displays maximum spots available', async () => {
+    const mockActivities = {
+      'Empty Activity': {
+        description: 'All spots available',
+        schedule: 'Monday 10am',
+        max_participants: 10,
+        participants: []
+      }
+    };
+
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockActivities
+    });
+
+    await fetchActivities();
+
+    expect(activitiesList.innerHTML).toContain('10 spots left');
+  });
+
+  test('handles special characters in activity names', async () => {
+    const mockActivities = {
+      '<Script>Alert(1)</Script>': {
+        description: 'Test XSS',
+        schedule: 'Monday 10am',
+        max_participants: 5,
+        participants: []
+      }
+    };
+
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockActivities
+    });
+
+    await fetchActivities();
+
+    expect(activitiesList.innerHTML).toContain('&lt;Script&gt;Alert(1)&lt;/Script&gt;');
+    expect(activitySelect.options[0].value).toBe('<Script>Alert(1)</Script>');
+  });
+
+  test('handles missing activity details', async () => {
+    const mockActivities = {
+      'Incomplete Activity': {
+        max_participants: 5
+      }
+    };
+
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockActivities
+    });
+
+    await fetchActivities();
+
+    expect(activitiesList.innerHTML).toContain('Incomplete Activity');
+    expect(activitiesList.innerHTML).not.toContain('undefined');
+  });
+});

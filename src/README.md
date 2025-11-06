@@ -6,6 +6,8 @@ A super simple FastAPI application that allows students to view and sign up for 
 
 - View all available extracurricular activities
 - Sign up for activities
+- Validation to prevent duplicate registrations
+- Full test coverage of edge cases
 
 ## Getting Started
 
@@ -32,12 +34,22 @@ A super simple FastAPI application that allows students to view and sign up for 
 | GET    | `/activities`                                                     | Get all activities with their details and current participant count |
 | POST   | `/activities/{activity_name}/signup?email=student@mergington.edu` | Sign up for an activity                                             |
 
+## Test Coverage
+
+The application includes comprehensive test coverage for edge cases:
+
+- Malformed JSON response handling
+- Server error (500) handling
+- Zero spots left display
+- Maximum spots available display
+- Special characters in activity names (XSS protection)
+- Missing activity details handling
+
 ## Data Model
 
 The application uses a simple data model with meaningful identifiers:
 
 1. **Activities** - Uses activity name as identifier:
-
    - Description
    - Schedule
    - Maximum number of participants allowed
@@ -48,3 +60,12 @@ The application uses a simple data model with meaningful identifiers:
    - Grade level
 
 All data is stored in memory, which means data will be reset when the server restarts.
+
+## Error Handling
+
+The application includes robust error handling for:
+- Invalid JSON responses
+- Server errors
+- Full activity registration
+- Missing activity data
+- Input validation

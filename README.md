@@ -4,11 +4,78 @@
 
 Hey gokulanbu-tech!
 
-Mona here. I'm done preparing your exercise. Hope you enjoy! 💚
+# Mergington High School Activities API
 
-Remember, it's self-paced so feel free to take a break! ☕️
+A super simple FastAPI application that allows students to view and sign up for extracurricular activities.
 
-[![](https://img.shields.io/badge/Go%20to%20Exercise-%E2%86%92-1f883d?style=for-the-badge&logo=github&labelColor=197935)](https://github.com/gokulanbu-tech/skills-getting-started-with-github-copilot/issues/1)
+## Features
+
+- View all available extracurricular activities
+- Sign up for activities
+- Validation to prevent duplicate registrations
+- Full test coverage of edge cases
+
+## Getting Started
+
+1. Install the dependencies:
+
+   ```
+   pip install fastapi uvicorn
+   ```
+
+2. Run the application:
+
+   ```
+   python app.py
+   ```
+
+3. Open your browser and go to:
+   - API documentation: http://localhost:8000/docs
+   - Alternative documentation: http://localhost:8000/redoc
+
+## API Endpoints
+
+| Method | Endpoint                                                          | Description                                                         |
+| ------ | ----------------------------------------------------------------- | ------------------------------------------------------------------- |
+| GET    | `/activities`                                                     | Get all activities with their details and current participant count |
+| POST   | `/activities/{activity_name}/signup?email=student@mergington.edu` | Sign up for an activity                                             |
+
+## Test Coverage
+
+The application includes comprehensive test coverage for edge cases:
+
+- Malformed JSON response handling
+- Server error (500) handling
+- Zero spots left display
+- Maximum spots available display
+- Special characters in activity names (XSS protection)
+- Missing activity details handling
+
+## Data Model
+
+The application uses a simple data model with meaningful identifiers:
+
+1. **Activities** - Uses activity name as identifier:
+   - Description
+   - Schedule
+   - Maximum number of participants allowed
+   - List of student emails who are signed up
+
+2. **Students** - Uses email as identifier:
+   - Name
+   - Grade level
+
+All data is stored in memory, which means data will be reset when the server restarts.
+
+## Error Handling
+
+The application includes robust error handling for:
+- Invalid JSON responses
+- Server errors
+- Full activity registration
+- Missing activity data
+- Input validation
+
 
 ---
 
